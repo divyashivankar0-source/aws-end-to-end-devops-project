@@ -8,7 +8,7 @@ def home():
     return """
     <h1>AWS DevOps Project</h1>
     <p>My application is running successfully!</p>
-    <p>Deployed using Docker, Jenkins and Kubernetes.</p>
+    <p>Deployed using Docker, Jenkins and Kubernetes</p>
     """
 
 @app.route("/health")
