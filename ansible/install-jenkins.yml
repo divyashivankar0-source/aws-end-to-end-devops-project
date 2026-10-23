@@ -1,0 +1,67 @@
+
+---
+- name: Install Jenkins on AWS EC2
+  hosts: jenkins_servers
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Update apt package cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install Java 21 and required dependencies
+      ansible.builtin.apt:
+        name:
+          - fontconfig
+          - openjdk-21-jre
+        state: present
+
+    - name: Create directory for repository signing keys
+      ansible.builtin.file:
+        path: /usr/share/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Download current Jenkins 2026 signing key
+      ansible.builtin.get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+        dest: /usr/share/keyrings/jenkins-keyring.asc
+        mode: "0644"
+        force: true
+
+    - name: Configure official Jenkins LTS repository
+      ansible.builtin.copy:
+        dest: /etc/apt/sources.list.d/jenkins.list
+        content: |
+          deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Update apt cache with Jenkins repository
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install Jenkins
+      ansible.builtin.apt:
+        name: jenkins
+        state: present
+
+    - name: Enable and start Jenkins
+      ansible.builtin.systemd:
+        name: jenkins
+        enabled: true
+        state: started
+
+    - name: Check Jenkins service status
+      ansible.builtin.command:
+        cmd: systemctl is-active jenkins
+      register: jenkins_status
+      changed_when: false
+
+    - name: Display Jenkins service status
+      ansible.builtin.debug:
+        msg: "Jenkins service status: {{ jenkins_status.stdout }}"
+

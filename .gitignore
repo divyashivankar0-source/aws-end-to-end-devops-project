@@ -1,8 +1,31 @@
+
+# Python
 .venv/
 __pycache__/
 *.pyc
 .env
-.terraform/
-*.tfstate
-*.tfstate.*
-crash.log
+
+# SSH private keys
+terraform/aws-devops-project-key
+ansible/aws-devops-project-key
+*.pem
+id_rsa
+id_ed25519
+
+# Terraform local files and state
+terraform/.terraform/
+terraform/terraform.tfvars
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/crash.log
+terraform/*.tfplan
+
+# Ansible inventory and secrets
+ansible/inventory.ini
+ansible/*-private-key
+ansible/*.retry
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
